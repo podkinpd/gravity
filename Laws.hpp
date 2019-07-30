@@ -13,7 +13,7 @@ namespace Laws {
    		double dist = v12.GetABS();
     	dist = dist * dist * dist;
     
-    	return v12 * (GravConst * f.GetMass(i1, j1) * f.GetMass(i2, j2)/(dist));
+    	return v12 * (GravConst * f.GetMass(i2, j2)/(dist));
 	}
 
 	class Env {
@@ -47,7 +47,7 @@ namespace Laws {
 			currentSpeedField[i] = std::vector<Vector>(m);
 			for(size_t j = 0; j < m; j++) {
 				currentGravityField[i][j] = Vector();
-				if(f.GetMass(i, j) > 1e+2) {
+				if(f.GetMass(i, j) > 1e+2 && f.GetMass(i, j) < 1e+15) {
 					for(size_t q = 0; q < n; q++) {
 						for(size_t w = 0; w < m; w++) {
 							if (((q != i) || (w != j)) && f.GetMass(q, w) > 1e+2) {
@@ -62,7 +62,7 @@ namespace Laws {
 		Field_of_mass result(n, m);
 		for(size_t i = 0; i < n; i++) {
 			for(size_t j = 0; j < m; j++) {
-				Env env(i, j, n, m);
+/*				Env env(i, j, n, m);
 				for(size_t e = 0; e < env.data_.size(); e++) {
 					int q = env.data_[e].first, w = env.data_[e].second;
 					Vector diffSpeed = currentSpeedField[i][j] - currentSpeedField[q][w];
@@ -75,7 +75,7 @@ namespace Laws {
 						}
 					}
 				}
-				result.SetSpeed(i, j, f.GetSpeed(i, j) + currentGravityField[i][j] * DT);
+*/				result.SetSpeed(i, j, f.GetSpeed(i, j) + currentGravityField[i][j] * DT);
 //				std::cout << result.GetSpeed(i, j) << std::endl;
 				double newPosX = i, newPosY = j;
 				newPosX += f.GetSpeed(i, j).GetX() * DT + 0.5 * currentGravityField[i][j].GetX() * DT * DT;
@@ -86,13 +86,13 @@ namespace Laws {
 				posY = (int)(floor(newPosY));
 //				std::cout << system("ps -ela") << std::endl;
 //				std::cout << i << ' ' << j << ' ' << newPosX << ' ' << newPosY << std::endl;
-				if (posX >= 0 and posX< n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
+				if (posX >= 0 and posX < n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
 				posY++;
-				if (posX >= 0 and posX< n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
+				if (posX >= 0 and posX < n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
 				posX++;
-				if (posX >= 0 and posX< n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
+				if (posX >= 0 and posX < n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
 				posY--;
-				if (posX >= 0 and posX< n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
+				if (posX >= 0 and posX < n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
 			}
 		}
 		return result;
