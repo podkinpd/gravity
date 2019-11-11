@@ -23,30 +23,39 @@ std::string GetStdoutFromCommand(std::string cmd) {
 }
 
 std::string GetNextFileName() {
-	return std::string("data/test") + GetStdoutFromCommand("ls data | wc -l");
+	return std::string("/home/gravity_data/data/test") + GetStdoutFromCommand("ls /home/gravity_data/data | wc -l");
 }
 	
 int main(int argc, char* argv[]) {
 	int n, m, maxk;
 	n = 160;
 	m = 120;
-	maxk = 400;
+	maxk = 100;
 	Field_of_mass field(n, m), temp(n, m);
-	int cx1 = 40, cy1 = 30, cx2 = 100, cy2 = 80;
-	Vector v(5e-4, 0, 0);
+	int cx1 = 60, cy1 = 60, cx2 = 100, cy2 = 60;
+	Vector v(0, 4e-5, 0);
+	Vector v1(0, -4e-5, 0);
 	for(size_t i = 0; i < 160; i++) {
 		for(size_t j = 0; j < 120; j++) {
-			if(((i-cx1)*(i-cx1) + (j-cy1)*(j-cy1) < 400) or ((i-cx2)*(i-cx2) + (j-cy2)*(j-cy2) < 400)) {
-				field.AddMass(i, j, 1e+8);
+			if ((i-cx1)*(i-cx1) + (j-cy1)*(j-cy1) < 400) { 
+				field.AddMass(i, j, 1e+10);
 				field.SetSpeed(i, j, v);
 			}
-			if(((i-cx1)*(i-cx1) + (j-cy1)*(j-cy1) < 100) or ((i-cx2)*(i-cx2) + (j-cy2)*(j-cy2) < 100)) {
-				field.AddMass(i, j, 2e+8);
+			if ((i-cx2)*(i-cx2) + (j-cy2)*(j-cy2) < 400) {
+				field.AddMass(i, j, 1e+10);
+				field.SetSpeed(i, j, v1);
+			}
+			if ((i-cx1)*(i-cx1) + (j-cy1)*(j-cy1) < 100) { 
+				field.AddMass(i, j, 2e+10);
 				field.SetSpeed(i, j, v);
+			}
+			if ((i-cx2)*(i-cx2) + (j-cy2)*(j-cy2) < 100) {
+				field.AddMass(i, j, 2e+10);
+				field.SetSpeed(i, j, v1);
 			}
 		}
 	}
-	field.AddMass(80, 60, 1e+17);
+//	field.SetMass(80, 60, 1e+17);
 	/*
 	for(size_t i = 50; i < 90; i++) {
 		for(size_t j = 30; j < 70; j++) {

@@ -75,26 +75,47 @@ namespace Laws {
 						}
 					}
 				}
-*/				result.SetSpeed(i, j, f.GetSpeed(i, j) + currentGravityField[i][j] * DT);
+*/
 //				std::cout << result.GetSpeed(i, j) << std::endl;
 				double newPosX = i, newPosY = j;
 				newPosX += f.GetSpeed(i, j).GetX() * DT + 0.5 * currentGravityField[i][j].GetX() * DT * DT;
 				newPosY += f.GetSpeed(i, j).GetY() * DT + 0.5 * currentGravityField[i][j].GetY() * DT * DT;
 				int posX, posY;
-				
+				double k;
+
 				posX = (int)(floor(newPosX));
 				posY = (int)(floor(newPosY));
 //				std::cout << system("ps -ela") << std::endl;
 //				std::cout << i << ' ' << j << ' ' << newPosX << ' ' << newPosY << std::endl;
-				if (posX >= 0 and posX < n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
+				if (posX >= 0 and posX < n and posY >= 0 and posY < m) {
+					k = 1. / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY));
+					result.AddMass(posX, posY, f.GetMass(i, j) * k );
+					result.AddImpulse(posX, posY, f.GetSpeed(i, j) * f.GetMass(i, j) * k);
+				}
 				posY++;
-				if (posX >= 0 and posX < n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
+
+				if (posX >= 0 and posX < n and posY >= 0 and posY < m) {
+					k = 1. / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY));
+					result.AddMass(posX, posY, f.GetMass(i, j) * k);
+					result.AddImpulse(posX, posY, f.GetSpeed(i, j) * f.GetMass(i, j) * k);
+				}
 				posX++;
-				if (posX >= 0 and posX < n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
+
+				if (posX >= 0 and posX < n and posY >= 0 and posY < m) {
+					k = 1. / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY));
+					result.AddMass(posX, posY, f.GetMass(i, j) * k );
+					result.AddImpulse(posX, posY, f.GetSpeed(i, j) * f.GetMass(i, j) * k);
+				}	
 				posY--;
-				if (posX >= 0 and posX < n and posY >= 0 and posY < m) result.AddMass(posX, posY, f.GetMass(i, j) / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY)));
+
+				if (posX >= 0 and posX < n and posY >= 0 and posY < m) {
+					k = 1. / (FIELD_DX * FIELD_DY) * (1 - fabs(newPosX - posX)) * (1 - fabs(newPosY - posY));
+					result.AddMass(posX, posY, f.GetMass(i, j) * k);
+					result.AddImpulse(posX, posY, f.GetSpeed(i, j) * f.GetMass(i, j) * k);
+				}
 			}
 		}
+		result.UpdateSpeed();
 		return result;
 	}
 }

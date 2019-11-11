@@ -14,15 +14,18 @@ class Field_of_mass {
 	Field_of_mass(int n, int m) : maxn_(n), maxm_(m) {
 		mass_ = std::vector<std::vector<double>>(n);
 		speed_ = std::vector<std::vector<Vector>>(n);
+		impulse_ = std::vector<std::vector<Vector>>(n);
 		viscosity_ = std::vector<std::vector<double>>(n);
 		for(size_t i = 0; i < n; i++) {
 			mass_[i] = std::vector<double>(m);
 			speed_[i] = std::vector<Vector>(m);
+			impulse_[i] = std::vector<Vector>(m);
 			viscosity_[i] = std::vector<double>(m);
 			for(size_t j = 0; j < m; j++) {
 				mass_[i][j] = 0;
 				viscosity_[i][j] = DEFAULT_VISCOSITY;
 				speed_[i][j] = Vector(0, 0);
+				impulse_[i][j] = Vector(0, 0);
 			}
 		}
 	}
@@ -30,8 +33,10 @@ class Field_of_mass {
 		maxn_ = mass.size();
 		maxm_ = mass[0].size();
 		speed_ = std::vector<std::vector<Vector>>(maxn_);
+		impulse_ = std::vector<std::vector<Vector>>(maxn_);
 		for(size_t i = 0; i < maxn_; ++i) {
 			speed_[i] = std::vector<Vector>(maxm_);
+			impulse_[i] = std::vector<Vector>(maxm_);
 		}
 		RecalculateViscosity_();
 	}
@@ -39,22 +44,29 @@ class Field_of_mass {
 		maxn_ = mass.size();
 		maxm_ = mass[0].size();
 		speed_ = std::vector<std::vector<Vector>>(maxn_);
+		impulse_ = std::vector<std::vector<Vector>>(maxn_);
 		for(size_t i = 0; i < maxn_; ++i) {
 			speed_[i] = std::vector<Vector>(maxm_);
+			impulse_[i] = std::vector<Vector>(maxm_);
 		}
 		RecalculateViscosity_();
 	}
 	Field_of_mass(std::vector<std::vector<double>>&& mass, std::vector<std::vector<Vector>>&& speed) : mass_(std::move(mass)), speed_(std::move(speed)) {
 		maxn_ = mass.size();
 		maxm_ = mass[0].size();
+		impulse_ = std::vector<std::vector<Vector>>(maxn_);
+		for(size_t i = 0; i < maxn_; ++i) {
+			impulse_[i] = std::vector<Vector>(maxm_);
+		}
 		RecalculateViscosity_();
 	}
-	Field_of_mass(Field_of_mass&& f) : mass_(std::move(f.mass_)), speed_(std::move(f.speed_)), viscosity_(std::move(f.viscosity_)), maxn_(f.maxn_), maxm_(f.maxm_) {}
-	Field_of_mass(const Field_of_mass& f) : mass_(std::move(f.mass_)), speed_(std::move(f.speed_)), viscosity_(std::move(f.viscosity_)), maxn_(f.maxn_), maxm_(f.maxm_) {}
+	Field_of_mass(Field_of_mass&& f) : mass_(std::move(f.mass_)), speed_(std::move(f.speed_)), impulse_(std::move(f.impulse_)), viscosity_(std::move(f.viscosity_)), maxn_(f.maxn_), maxm_(f.maxm_) {}
+	Field_of_mass(const Field_of_mass& f) : mass_(std::move(f.mass_)), speed_(std::move(f.speed_)), impulse_(std::move(f.impulse_)), viscosity_(std::move(f.viscosity_)), maxn_(f.maxn_), maxm_(f.maxm_) {}
 
 	void operator=(Field_of_mass&& f) {
 		mass_ = std::move(f.mass_);
 		speed_ = std::move(f.speed_);
+		impulse_ = std::move(f.impulse_);
 		viscosity_ = std::move(f.viscosity_);
 		maxn_ = f.maxn_;
 		maxm_ = f.maxm_;
@@ -62,6 +74,7 @@ class Field_of_mass {
 	Field_of_mass& operator=(Field_of_mass& f) {
 		mass_ = std::move(f.mass_);
 		speed_ = std::move(f.speed_);
+		impulse_ = std::move(f.impulse_);
 		viscosity_ = std::move(f.viscosity_);
 		maxn_ = f.maxn_;
 		maxm_ = f.maxm_;
@@ -72,6 +85,7 @@ class Field_of_mass {
 	}
 	void SetMass(int i, int j, double newMass) {
 		mass_[i][j] = newMass;
+		impulse_[i][j] = speed_[i][j] * mass_[i][j];
 		RecalculateViscosity_(i, j);
 	}
 	void AddMass(int i, int j, double additionalMass) {
@@ -88,7 +102,21 @@ class Field_of_mass {
 	void AddSpeed(int i, int j, const Vector& v) {
 		speed_[i][j] += v;
 	}
-	
+	void UpdateSpeed() {
+		for(size_t i = 0; i < maxn_; i++) {
+			for(size_t j = 0; j < maxm_; j++) {
+				if(mass_[i][j] > 1e+2) speed_[i][j] = impulse_[i][j] / mass_[i][j];
+			}
+		}
+	}
+
+	Vector GetImpulse(int i, int j) const {
+		return impulse_[i][j];
+	}
+	void AddImpulse(int i, int j, const Vector& v) {
+		impulse_[i][j] += v;
+	}
+
 	double GetViscosity(int i, int j) const {
 		return viscosity_[i][j];
 	}
@@ -115,6 +143,7 @@ class Field_of_mass {
  protected:
 	std::vector<std::vector<double>> mass_;
 	std::vector<std::vector<Vector>> speed_;
+	std::vector<std::vector<Vector>> impulse_;
 	std::vector<std::vector<double>> viscosity_;
 	int maxn_;
 	int maxm_;

@@ -5,4 +5,4 @@ const double DT = 5000;
 const double FIELD_DX = 1;
 const double FIELD_DY = 1;
 const double EPS = 1e-5;
-const double GravConst = 2e-23;
+const double GravConst = 5e-19;

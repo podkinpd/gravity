@@ -2,6 +2,7 @@
 #include <cmath>
 #include <fstream>
 #include <string>
+#include <iostream>
 
 sf::Color getColor(double m) {
 	if(m > 1e+14) return sf::Color(255, 255, 255);
@@ -13,10 +14,10 @@ sf::Color getColor(double m) {
 
 int main()
 {
-	std::string imname("images/image");
+	std::string imname("/home/gravity_data/images/image");
 	std::string imext(".png");
-	std::ifstream inf;
-	inf.open("data/test32");
+/*	std::ifstream inf;
+	inf.open("/home/gravity_data/data/test63");
 	int mk, n, m;
 	inf >> mk >> n >> m;
 	double d;
@@ -33,7 +34,7 @@ int main()
 		}
 		sf::Image im;
 		im.create(800, 600);
-
+*/
  /*   sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
@@ -52,12 +53,16 @@ int main()
         window.display();
     }
 */
-		for(size_t i = 0; i < 800; i++) {
-			for(size_t j = 0; j < 600; j++) {
-				im.setPixel(i, j, getColor(mass[i/5][j/5]));
+		sf::Image im;
+		im.create(1920, 1080);
+		for(size_t i = 0; i < 1920; i++) {
+			for(size_t j = 0; j < 1080; j++) {
+				im.setPixel(i, j, sf::Color(std::rand() % 256, std::rand() % 256, std::rand() % 256));
 			}
 		}
+		int q;
+		q = 0;
 		im.saveToFile(imname + std::to_string(q) + imext);
-	}
+/*	}*/
     return 0;
 }
